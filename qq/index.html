@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi ESPOL - App Estudiantil</title>
+  
+  <!-- FontAwesome Iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="phone-frame">
+
+    <!-- BARRA DE ESTADO iOS -->
+    <div class="status-bar">
+      <span id="liveClock">09:41</span>
+      <div style="display:flex; gap:6px;">
+        <i class="fa-solid fa-signal"></i>
+        <i class="fa-solid fa-wifi"></i>
+        <i class="fa-solid fa-battery-full"></i>
+      </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="logo-miespol">
+        <span class="logo-mi">mi</span><span class="logo-espol">espol</span><span class="logo-reg">®</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" title="Escanear QR"><i class="fa-solid fa-camera-rotate"></i></button>
+        <button class="icon-btn" onclick="toggleNotificationDrawer()">
+          <i class="fa-regular fa-bell"></i>
+          <span class="red-dot-badge" id="notifBadge">3</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- DRAWER / PANEL DE NOTIFICACIONES -->
+    <div id="notificationDrawer" class="notif-drawer">
+      <div class="drawer-header">
+        <h4><i class="fa-solid fa-bell"></i> Notificaciones Activas</h4>
+        <button onclick="toggleNotificationDrawer()" class="btn-close-drawer">&times;</button>
+      </div>
+      <div id="notifListContainer" class="drawer-content"></div>
+    </div>
+
+    <!-- CONTENIDO DE LA APP -->
+    <main class="app-content">
+
+      <!-- PÁGINA INICIO -->
+      <section id="inicio" class="app-page active-page">
+        <div class="user-profile-section">
+          <div class="avatar-large">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <span class="greeting-text">¡Buenas noches!</span>
+          <h2 class="user-fullname">AIDHAN STEEVEN<br>CEDEÑO MONCADA</h2>
+          <span class="student-id">202614061</span>
+        </div>
+
+        <!-- CAPA DETRÁS: TARJETA DE IDENTIFICACIÓN CON CÓDIGO QR -->
+        <div class="student-qr-card">
+          <div class="qr-header">
+            <h3 class="qr-role-title">ESTUDIANTE</h3>
+            <button class="btn-share-qr"><i class="fa-solid fa-share-nodes"></i></button>
+          </div>
+
+          <div class="qr-code-box">
+            <!-- QR Generado Dinámicamente via API -->
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=202614061-AIDHAN-CEBDENO" alt="Código QR Estudiantil" class="qr-image">
+          </div>
+
+          <div class="student-academic-info">
+            <span class="info-label">Unidad</span>
+            <p class="info-value">FACULTAD DE INGENIERÍA EN ELECTRICIDAD Y COMPUTACIÓN</p>
+
+            <div class="career-blood-row">
+              <div class="career-box">
+                <p class="career-title">ELECTRÓNICA Y AUTOMATIZACIÓN</p>
+              </div>
+              <div class="blood-type-box">
+                <span class="blood-label">O+</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM SHEET DESLIZABLE (MENÚ DE NAVEGACIÓN RÁPIDA) -->
+        <div class="sheet-container" id="draggableSheet">
+          
+          <!-- TIRADOR DE ARRASTRE -->
+          <div class="sheet-drag-handle" onclick="toggleSheetPosition()">
+            <span class="drag-bar"></span>
+          </div>
+
+          <div class="grid-menu">
+            <div class="menu-card" onclick="openSection('horario')">
+              <div class="icon-box color-blue"><i class="fa-solid fa-graduation-cap"></i></div>
+              <span>Académico</span>
+            </div>
+
+            <div class="menu-card" onclick="openSection('calendario')">
+              <div class="icon-box color-lime"><i class="fa-solid fa-calendar-days"></i></div>
+              <span>Calendario</span>
+            </div>
+
+            <div class="menu-card highlight-card" onclick="openSection('tareas')">
+              <div class="icon-box color-red"><i class="fa-solid fa-list-check"></i></div>
+              <span>Tareas</span>
+              <span class="badge-new">¡Nuevo!</span>
+            </div>
+
+            <div class="menu-card">
+              <div class="icon-box color-purple"><i class="fa-solid fa-hand-holding-heart"></i></div>
+              <span>Bienestar</span>
+            </div>
+
+            <div class="menu-card">
+              <div class="icon-box color-cyan"><i class="fa-solid fa-certificate"></i></div>
+              <span>Certificados</span>
+            </div>
+
+            <div class="menu-card">
+              <div class="icon-box color-orange"><i class="fa-solid fa-utensils"></i></div>
+              <span>Restaurantes</span>
+            </div>
+
+            <div class="menu-card">
+              <div class="icon-box color-pink"><i class="fa-solid fa-map-location-dot"></i></div>
+              <span>Mapa</span>
+            </div>
+
+            <div class="menu-card" onclick="openSection('configuracion')">
+              <div class="icon-box color-gear"><i class="fa-solid fa-gear"></i></div>
+              <span>Configuración</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PÁGINA HORARIO -->
+      <section id="horario" class="app-page">
+        <div class="page-header">
+          <h3><i class="fa-solid fa-graduation-cap"></i> Mi Horario Clases</h3>
+        </div>
+        <div class="schedule-container" id="scheduleListContainer"></div>
+      </section>
+
+      <!-- PÁGINA CALENDARIO -->
+      <section id="calendario" class="app-page">
+        <div class="page-header">
+          <h3><i class="fa-solid fa-calendar-days"></i> Calendario Académico</h3>
+        </div>
+        <div class="calendar-wrapper">
+          <div class="calendar-card">
+            <div class="calendar-nav-header">
+              <button class="cal-nav-btn" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+              <span class="month-label" id="currentMonthYear">Agosto 2026</span>
+              <button class="cal-nav-btn" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+
+            <div class="calendar-grid">
+              <div class="day-name">Lu</div><div class="day-name">Ma</div><div class="day-name">Mi</div>
+              <div class="day-name">Ju</div><div class="day-name">Vi</div><div class="day-name">Sá</div><div class="day-name">Do</div>
+            </div>
+
+            <div class="calendar-grid" id="calendarDaysGrid"></div>
+          </div>
+
+          <div class="day-events-container">
+            <div class="day-events-title" id="selectedDayTitle">Actividades para Hoy</div>
+            <div id="eventsList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PÁGINA TAREAS -->
+      <section id="tareas" class="app-page">
+        <div class="page-header">
+          <h3><i class="fa-solid fa-list-check"></i> Gestor de Tareas</h3>
+        </div>
+        <div class="semaphore-bar">
+          <span><i class="s-dot green"></i> Baja</span>
+          <span><i class="s-dot yellow"></i> Media</span>
+          <span><i class="s-dot red"></i> Alta</span>
+        </div>
+        <div class="task-cards-list" id="taskListContainer"></div>
+      </section>
+
+      <!-- PÁGINA CONFIGURACIÓN -->
+      <section id="configuracion" class="app-page">
+        <div class="page-header">
+          <h3><i class="fa-solid fa-sliders"></i> Configuración</h3>
+        </div>
+
+        <div class="config-container">
+
+          <!-- 1. TIPO DE NOTIFICACIÓN -->
+          <div class="config-card">
+            <div class="config-title">
+              <i class="fa-solid fa-bell"></i> Tipo de Notificaciones
+            </div>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <span>Tareas pendientes</span>
+                <input type="checkbox" id="chk-tareas" checked onchange="updateNotificationsFilter()">
+              </label>
+              <label class="checkbox-item">
+                <span>Control de Lectura</span>
+                <input type="checkbox" id="chk-lecturas" checked onchange="updateNotificationsFilter()">
+              </label>
+              <label class="checkbox-item">
+                <span>Lecciones y Quizzes</span>
+                <input type="checkbox" id="chk-lecciones" checked onchange="updateNotificationsFilter()">
+              </label>
+              <label class="checkbox-item">
+                <span>Anuncios de Profesores</span>
+                <input type="checkbox" id="chk-anuncios" onchange="updateNotificationsFilter()">
+              </label>
+            </div>
+            <button class="btn-save" onclick="saveNotificationTypes()">
+              <i class="fa-solid fa-floppy-disk"></i> Guardar Filtro Notificaciones
+            </button>
+          </div>
+
+          <!-- 2. RELEVANCIA DE MATERIAS -->
+          <div class="config-card">
+            <div class="config-title">
+              <i class="fa-solid fa-chart-pie"></i> Relevancia de Materias
+            </div>
+            <div class="subject-priority-list">
+              <div class="subject-row">
+                <span class="subject-name">• CDV (Cálculo Vectorial)</span>
+                <button class="priority-badge-btn p-alta" data-subject="CDV" onclick="cyclePriority(this)">ALTA</button>
+              </div>
+              <div class="subject-row">
+                <span class="subject-name">• FM (Física Mecánica)</span>
+                <button class="priority-badge-btn p-alta" data-subject="FM" onclick="cyclePriority(this)">ALTA</button>
+              </div>
+              <div class="subject-row">
+                <span class="subject-name">• QG (Química General)</span>
+                <button class="priority-badge-btn p-media" data-subject="QG" onclick="cyclePriority(this)">MEDIA</button>
+              </div>
+              <div class="subject-row">
+                <span class="subject-name">• ARP (Algoritmos y Prog.)</span>
+                <button class="priority-badge-btn p-baja" data-subject="ARP" onclick="cyclePriority(this)">BAJA</button>
+              </div>
+            </div>
+            <button class="btn-save" onclick="applyPriorityChanges()">
+              <i class="fa-solid fa-floppy-disk"></i> Actualizar Prioridades
+            </button>
+          </div>
+
+          <!-- 3. AGENDAR TAREAS -->
+          <div class="config-card">
+            <div class="config-title">
+              <i class="fa-solid fa-calendar-plus"></i> Agendar Nuevas Tareas
+            </div>
+            <form onsubmit="addNewTask(event)" class="form-group">
+              <input type="text" id="newTaskTitle" class="input-dark" placeholder="TÍTULO DE TAREA" required>
+              <input type="date" id="newTaskDate" class="input-dark" required>
+              <select id="newTaskSubject" class="input-dark" required>
+                <option value="CDV">Cálculo Vectorial (CDV)</option>
+                <option value="FM">Física Mecánica (FM)</option>
+                <option value="QG">Química General (QG)</option>
+                <option value="ARP">Algoritmos (ARP)</option>
+              </select>
+              <button type="submit" class="btn-submit-task">+ Agendar y Reflejar en Calendario</button>
+            </form>
+          </div>
+
+          <!-- 4. SISTEMA DE RECORDATORIOS Y REPETICIONES -->
+          <div class="config-card alarm-card-pro">
+            <div class="config-title text-amber">
+              <i class="fa-solid fa-clock"></i> Centro de Recordatorios
+            </div>
+
+            <div class="alarm-display-screen">
+              <div class="alarm-led-status" id="alarmLedStatus">
+                <span class="led-dot"></span> <span id="alarmLedText">SIN RECORDATORIO</span>
+              </div>
+              <div class="alarm-time-digital" id="alarmDigitalDisplay">00:00</div>
+              <div class="alarm-subtext" id="alarmSubtext">Configure su próximo recordatorio académico</div>
+            </div>
+
+            <!-- PRESETS DE TIEMPO -->
+            <div class="alarm-presets">
+              <button class="preset-pill" onclick="quickSetAlarm(10)">10s (Prueba)</button>
+              <button class="preset-pill" onclick="quickSetAlarm(30)">30s</button>
+              <button class="preset-pill active-pill" onclick="quickSetAlarm(60)">1 Min</button>
+              <button class="preset-pill" onclick="quickSetAlarm(300)">5 Min</button>
+            </div>
+
+            <div class="alarm-custom-row">
+              <input type="number" id="alarmCustomMins" class="input-dark-sm" min="1" max="120" value="2">
+              <span class="unit-text">minutos</span>
+              <button class="btn-alarm-action start" onclick="setCustomAlarm()">
+                <i class="fa-solid fa-bell"></i> Activar Recordatorio
+              </button>
+            </div>
+
+            <!-- INTERVALO DE REPETICIÓN -->
+            <div class="interval-section">
+              <div class="interval-header">
+                <i class="fa-solid fa-rotate"></i>
+                <span>Intervalo de Repetición</span>
+              </div>
+              <div class="interval-controls">
+                <span class="interval-label">Repetir cada:</span>
+                <select id="intervalSelect" class="input-dark-select">
+                  <option value="1">1 minuto</option>
+                  <option value="3">3 minutos</option>
+                  <option value="5" selected>5 minutos</option>
+                  <option value="10">10 minutos</option>
+                  <option value="15">15 minutos</option>
+                </select>
+              </div>
+              <p class="interval-hint">Si no desactivas el recordatorio, volverá a sonar en el tiempo seleccionado.</p>
+            </div>
+
+            <button class="btn-alarm-action cancel hidden" id="btnCancelAlarm" onclick="cancelAlarm()">
+              <i class="fa-solid fa-xmark"></i> Desactivar Recordatorio
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BARRA INFERIOR CÁPSULA -->
+    <div class="bottom-nav-container">
+      <nav class="capsule-nav">
+        <button class="nav-btn active" id="btn-inicio" onclick="openSection('inicio')">
+          <div class="nav-icon-bg"><i class="fa-solid fa-house"></i></div>
+        </button>
+        <button class="nav-btn" id="btn-horario" onclick="openSection('horario')">
+          <div class="nav-icon-bg"><i class="fa-solid fa-graduation-cap"></i></div>
+        </button>
+        <button class="nav-btn" id="btn-calendario" onclick="openSection('calendario')">
+          <div class="nav-icon-bg"><i class="fa-solid fa-calendar-days"></i></div>
+        </button>
+        <button class="nav-btn" id="btn-tareas" onclick="openSection('tareas')">
+          <div class="nav-icon-bg"><i class="fa-solid fa-list-check"></i></div>
+        </button>
+        <button class="nav-btn" id="btn-configuracion" onclick="openSection('configuracion')">
+          <div class="nav-icon-bg"><i class="fa-solid fa-gear"></i></div>
+        </button>
+      </nav>
+    </div>
+
+  </div>
+
+  <!-- MODAL DE RECORDATORIO ACTIVO -->
+  <div id="alarmTriggerModal" class="alarm-trigger-overlay">
+    <div class="alarm-trigger-card">
+      <div class="bell-ringing-icon">
+        <i class="fa-solid fa-bell fa-bounce"></i>
+      </div>
+      <h2>¡RECORDATORIO ACADÉMICO!</h2>
+      <p id="modalIntervalNotice">Es momento de revisar tus compromisos académicos pendientes.</p>
+      
+      <div class="modal-buttons-group">
+        <button class="btn-stop-alarm" onclick="stopActiveSoundAndModal(false)">
+          <i class="fa-solid fa-power-off"></i> APAGAR RECORDATORIO
+        </button>
+        <button class="btn-snooze-alarm" onclick="stopActiveSoundAndModal(true)">
+          <i class="fa-solid fa-clock-rotate-left"></i> Posponer por intervalo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST DE NOTIFICACIÓN -->
+  <div id="saveToast" class="save-toast">
+    <i class="fa-solid fa-circle-check"></i> <span id="toastMsg">Configuración actualizada</span>
+  </div>
+
+  <script src="script.js"></script>
+  <!-- Enlace al Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Configuración de color para la barra de estado en móviles -->
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-capable" content="yes">
+</body>
+</html>
